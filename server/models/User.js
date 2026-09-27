@@ -15,7 +15,8 @@ const userSchema = new mongoose.Schema(
 userSchema.methods.toPublic = function toPublic() {
     return {
         _id: this._id,
-        fullName: this.fullName,
+        // Accounts created by the older app in the same database store `name` instead.
+        fullName: this.fullName || this.get('name') || 'Student',
         email: this.email,
         role: this.role,
         photoURL: this.photoURL,

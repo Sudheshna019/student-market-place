@@ -26,6 +26,11 @@ body {
     text-decoration: none;
 }
 
+.navbar .nav-link,
+.navbar .btn {
+    white-space: nowrap;
+}
+
 .cart-count {
     font-size: 0.75rem;
     padding: 0.25em 0.6em;
