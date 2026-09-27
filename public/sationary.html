@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stationery - Student MarketPlace</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .hero-section {
+      background: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.2)), url('./IMAGES2/STATIONARY.jpg');
+      background-size:cover;
+      background-position: center;
+      color: rgb(7, 7, 7);
+      padding: 100px 0;
+    }
+    .product-card {
+      transition: transform 0.3s;
+      height: 100%;
+    }
+    .product-card:hover {
+      transform: translateY(-5px);
+    }
+    .footer {
+      background-color: #343a40;
+      color: white;
+      padding: 50px 0 20px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Include this script at the top of your HTML files -->
+  <script>
+    // Fetch and inject the navigation bar
+    fetch('navbar.html')
+      .then(response => response.text())
+      .then(data => {
+        document.body.insertAdjacentHTML('afterbegin', data);
+      });
+  </script>
+
+<section class="hero-section mt-5 text-center">
+  <div class="container">
+    <h1 class="display-4 fw-bold">Stationery</h1>
+    <p class="lead">Find the best deals on quality stationery for your academic needs.</p>
+  </div>
+</section>
+
+<section class="py-5">
+  <div class="container">
+    <div class="row g-4" id="itemsContainer">
+      <!-- Items will be loaded dynamically here -->
+    </div>
+  </div>
+</section>
+<footer class="footer text-center mt-5">
+  <p>© 2025 Student MarketPlace. All rights reserved.</p>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js">
+    const listedItems = JSON.parse(localStorage.getItem('marketplaceItems')) || [];
+
+    function displaySationary() {
+        const container = document.getElementById('stationeryContainer');
+        container.innerHTML = '';
+
+        const stationery = listedItems.filter(item => item.category === 'Stationery');
+        if (stationery.length === 0) {
+            container.innerHTML = '<p class="text-center">No stationery items listed yet.</p>';
+        } else {
+            stationery.forEach(item => {
+                const card = `
+                    <div class="col-md-4">
+                        <div class="card product-card shadow-sm">
+                            <img src="${item.image}" class="card-img-top" alt="${item.name}">
+                            <div class="card-body">
+                                <h5 class="card-title">${item.name}</h5>
+                                <p class="card-text text-muted small">Condition: ${item.condition}</p>
+                                <p class="card-text text-muted small">${item.description}</p>
+                                <p class="fw-bold">$${item.price}</p>
+                                <a href="#" class="btn btn-primary">Add to Cart</a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', card);
+            });
+        }
+    }
+
+    displayStationery();
+  </script>
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script
+   <!-- Cart Functionality -->
+   <script>
+     // Initialize cart in localStorage if it doesn't exist
+     if (!localStorage.getItem('cart')) {
+       localStorage.setItem('cart', JSON.stringify([]));
+     }
+ 
+   </script>
+
+<!-- Add Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+<!-- Add API Config -->
+<script src="js/api-config.js"></script>
+
+<!-- Add our auth.js file -->
+<script src="js/auth.js"></script>
+
+<!-- Add items.js file -->
+<script src="js/items.js"></script>
+
+<script>
+    // Load stationery when the page loads
+    document.addEventListener('DOMContentLoaded', async function() {
+        await loadItemsByCategory('stationery');
+    });
+</script>
+
+</body>
+</html>

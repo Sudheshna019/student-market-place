@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - Student MarketPlace</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .profile-header {
+            background: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), url('./IMAGES2/cover(stationary).avif');
+            background-size: cover;
+            background-position: center;
+            padding: 100px 0 50px;
+            color: white;
+            margin-bottom: 30px;
+        }
+        .profile-image {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 5px solid white;
+            object-fit: cover;
+            background-color: #f8f9fa;
+        }
+        .nav-tabs .nav-link.active {
+            font-weight: bold;
+        }
+        .card {
+            transition: transform 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-primary" href="index.html">
+                <i class="fas fa-graduation-cap"></i> Student MarketPlace
+            </a>
+        </div>
+    </nav>
+
+    <!-- Profile Header -->
+    <div class="profile-header text-center">
+            <img id="profileImage" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150' viewBox='0 0 150 150'%3E%3Crect width='150' height='150' fill='%23f8f9fa'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='14' fill='%236c757d'%3ENo Image%3C/text%3E%3C/svg%3E" class="profile-image mb-3" alt="Profile Image">
+            <h2 id="profileName" class="mb-1"></h2>
+            <p id="profileEmail" class="text-muted mb-3"></p>
+            <button class="btn btn-outline-light" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- Profile Content -->
+    <div class="container">
+        <ul class="nav nav-tabs mb-4" id="profileTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="listings-tab" data-bs-toggle="tab" data-bs-target="#listings" type="button" role="tab">My Listings</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="orders-tab" data-bs-toggle="tab" data-bs-target="#orders" type="button" role="tab">My Orders</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="edit-tab" data-bs-toggle="tab" data-bs-target="#edit" type="button" role="tab">Edit Profile</button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="profileTabsContent">
+            <!-- My Listings Tab -->
+            <div class="tab-pane fade show active" id="listings" role="tabpanel">
+                <div class="row g-4" id="listingsContainer">
+                    <!-- Listings will be loaded here -->
+                </div>
+            </div>
+
+            <!-- My Orders Tab -->
+            <div class="tab-pane fade" id="orders" role="tabpanel">
+                <div class="list-group" id="ordersList">
+                    <!-- Orders will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Edit Profile Tab -->
+            <div class="tab-pane fade" id="edit" role="tabpanel">
+                <div class="card">
+                    <div class="card-body">
+                        <form id="editProfileForm">
+                            <div class="mb-3">
+                                <label for="editProfileImage" class="form-label">Profile Image</label>
+                                <input type="file" class="form-control" id="editProfileImage" accept="image/*">
+                            </div>
+                            <div class="mb-3">
+                                <label for="editProfileName" class="form-label">Full Name</label>
+                                <input type="text" class="form-control" id="editProfileName" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Add API Config & App scripts -->
+    <script src="js/api-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/items.js"></script>
+    <script src="js/profile.js"></script>
+    <script src="js/validations.js"></script>
+
+    <script>
+        // Check authentication on page load
+        auth.onAuthStateChanged((user) => {
+            if (!user) {
+                window.location.href = 'index.html';
+                return;1
+            }
+
+            // Update profile information
+            document.getElementById('profileName').textContent = user.displayName || 'User';
+            document.getElementById('profileEmail').textContent = user.email;
+            
+            // Load profile image
+            db.collection('users').doc(user.uid).get()
+                .then(doc => {
+                    if (doc.exists && doc.data().photoURL) {
+                        document.getElementById('profileImage').src = doc.data().photoURL;
+                    }
+                });
+
+            // Load user's listings
+            loadUserListings();
+            
+            // Load user's orders
+            loadUserOrders();
+
+            // Load cart count
+            loadCartCount();
+
+            // Add tab change event listener
+            document.getElementById('listings-tab').addEventListener('click', loadUserListings);
+            document.getElementById('orders-tab').addEventListener('click', loadUserOrders);
+        });
+
+        // Handle edit profile form submission
+        document.getElementById('editProfileForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const user = auth.currentUser;
+            if (!user) return;
+
+            const newName = document.getElementById('editProfileName').value;
+            const profileImage = document.getElementById('editProfileImage').files[0];
+
+            try {
+                // Update display name
+                await user.updateProfile({
+                    displayName: newName
+                });
+
+                // Handle profile image if provided
+                if (profileImage) {
+                    // Convert image to base64
+                    const base64Image = await convertImageToBase64(profileImage);
+                    
+                    // Store in Firestore
+                    await db.collection('users').doc(user.uid).set({
+                        photoURL: base64Image,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
+
+                    // Update profile image in UI
+                    document.getElementById('profileImage').src = base64Image;
+                }
+
+                showAlert('success', 'Profile updated successfully!');
+                document.getElementById('profileName').textContent = newName;
+            } catch (error) {
+                console.error('Error updating profile:', error);
+                showAlert('danger', 'Failed to update profile. Please try again.');
+            }
+        });
+
+        // Convert image to base64
+        function convertImageToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        // Mark item as sold
+        async function markItemAsSold(itemId) {
+            await markItemAsSold(itemId);
+        }
+
+        // Function to load cart count
+        async function loadCartCount() {
+            const user = auth.currentUser;
+            if (!user) return;
+
+            try {
+                const cartRef = db.collection('carts').doc(user.uid);
+                const cartDoc = await cartRef.get();
+                
+                const cartCount = document.getElementById('cartCount');
+                if (cartDoc.exists && cartDoc.data().items) {
+                    const count = cartDoc.data().items.length;
+                    cartCount.textContent = count;
+                    cartCount.style.display = count > 0 ? 'block' : 'none';
+                } else {
+                    cartCount.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error loading cart count:', error);
+            }
+        }
+
+        // Function to create listing card
+        function createListingCard(item, itemId) {
+            const col = document.createElement('div');
+            col.className = 'col-6 col-md-4 col-lg-3';
+
+            const card = document.createElement('div');
+            card.className = 'card product-card h-100 shadow-sm';
+
+            // Card Image
+            const img = document.createElement('img');
+            img.className = 'card-img-top';
+            img.src = item.image || 'https://via.placeholder.com/150';
+            img.alt = item.name;
+            card.appendChild(img);
+
+            const cardBody = document.createElement('div');
+            cardBody.className = 'card-body d-flex flex-column';
+
+            // Item Name
+            const title = document.createElement('h5');
+            title.className = 'card-title';
+            title.textContent = item.name;
+            cardBody.appendChild(title);
+
+            // Item Description
+            const description = document.createElement('p');
+            description.className = 'card-text text-muted small';
+            description.textContent = item.description;
+            cardBody.appendChild(description);
+
+            // Item Condition
+            const condition = document.createElement('p');
+            condition.className = 'card-text text-muted small';
+            condition.textContent = `Condition: ${item.condition}`;
+            cardBody.appendChild(condition);
+
+            // Price
+            const priceDiv = document.createElement('div');
+            priceDiv.className = 'mt-auto';
+            const price = document.createElement('p');
+            price.className = 'fw-bold mb-2';
+            price.textContent = `₹${item.price}`;
+            priceDiv.appendChild(price);
+            cardBody.appendChild(priceDiv);
+
+            // Status Badge
+            const statusBadge = document.createElement('div');
+            statusBadge.className = 'mb-2';
+            const badge = document.createElement('span');
+            badge.className = item.status === 'sold' ? 'badge bg-secondary' : 'badge bg-success';
+            badge.textContent = item.status === 'sold' ? 'Sold' : 'Available';
+            statusBadge.appendChild(badge);
+            cardBody.appendChild(statusBadge);
+
+            // Delete button (only show if item is not sold)
+            if (item.status !== 'sold') {
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'btn btn-outline-danger btn-sm w-100';
+                deleteBtn.textContent = 'Delete';
+                deleteBtn.onclick = () => deleteItem(itemId);
+                cardBody.appendChild(deleteBtn);
+            }
+
+            card.appendChild(cardBody);
+            col.appendChild(card);
+            return col;
+        }
+
+        // Load user's listings
+        async function loadUserListings() {
+            const user = auth.currentUser;
+            if (!user) return;
+
+            try {
+                const listingsContainer = document.getElementById('listingsContainer');
+                if (!listingsContainer) return;
+
+                // Get user's listings from Firestore
+                const listingsSnapshot = await db.collection('items')
+                    .where('sellerId', '==', user.uid)
+                    .orderBy('createdAt', 'desc')
+                    .get();
+
+                if (listingsSnapshot.empty) {
+                    listingsContainer.innerHTML = '<div class="col-12 text-center py-4">No listings found</div>';
+                    return;
+                }
+
+                listingsContainer.innerHTML = '';
+                listingsSnapshot.forEach(doc => {
+                    const item = doc.data();
+                    const itemElement = createListingCard(item, doc.id);
+                    listingsContainer.appendChild(itemElement);
+                });
+            } catch (error) {
+                console.error('Error loading listings:', error);
+                showAlert('danger', 'Failed to load listings. Please try again.');
+            }
+        }
+    </script>
+</body>
+</html> 

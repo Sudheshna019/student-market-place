@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Item to Borrow Section</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        .add-item-form {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="add-item-form">
+        <h2 class="text-center mb-4">Add Item to Borrow Section</h2>
+        <form id="addItemForm">
+            <!-- Item Name -->
+            <div class="form-group mb-3">
+                <label for="itemName">Item Name</label>
+                <input type="text" class="form-control" id="itemName" placeholder="e.g., Introduction to Algorithms" required>
+            </div>
+
+            <!-- Item Category -->
+            <div class="form-group mb-3">
+                <label for="itemCategory">Category</label>
+                <select class="form-control" id="itemCategory" required>
+                    <option value="Textbooks">Textbooks</option>
+                    <option value="Gadgets">Gadgets</option>
+                    <option value="Stationery">Stationery</option>
+                    <option value="Lab Equipment">Lab Equipment</option>
+                </select>
+            </div>
+
+            <!-- Item Description -->
+            <div class="form-group mb-3">
+                <label for="itemDescription">Description</label>
+                <textarea class="form-control" id="itemDescription" rows="3" placeholder="e.g., Good condition, latest edition" required></textarea>
+            </div>
+
+            <!-- Item Condition -->
+            <div class="form-group mb-3">
+                <label for="itemCondition">Condition</label>
+                <select class="form-control" id="itemCondition" required>
+                    <option value="New">New</option>
+                    <option value="Like New">Like New</option>
+                    <option value="Good">Good</option>
+                    <option value="Fair">Fair</option>
+                </select>
+            </div>
+
+            <!-- Borrow Duration -->
+            <div class="form-group mb-3">
+                <label for="borrowDuration">Borrow Duration (in weeks)</label>
+                <input type="number" class="form-control" id="borrowDuration" min="1" required>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary w-100">Add Item</button>
+        </form>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/api-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/items.js"></script>
+    <script>
+        document.getElementById('addItemForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const itemData = {
+                name: document.getElementById('itemName').value.trim(),
+                category: document.getElementById('itemCategory').value.toLowerCase().replace(/\s+/g, '-'),
+                description: document.getElementById('itemDescription').value.trim(),
+                condition: document.getElementById('itemCondition').value,
+                rentalPeriod: `${document.getElementById('borrowDuration').value} weeks`,
+                price: 50, // default nominal daily rental rate in rupees
+                deposit: 200,
+                type: 'borrow'
+            };
+
+            const result = await addItemForSale(itemData);
+            if (result) {
+                document.getElementById('addItemForm').reset();
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1500);
+            }
+        });
+    </script>
+</body>
+</html>

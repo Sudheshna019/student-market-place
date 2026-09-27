@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Textbooks - Student MarketPlace</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+/* Hero Section with Blur Effect */
+.hero-section {
+position: relative;
+background: url('./IMAGES2/TEXTBOOKC.jpg') no-repeat center center/cover;
+color: rgb(247, 244, 244);
+padding: 150px 0;
+overflow: hidden;
+}
+
+/* Blur Overlay */
+.hero-section::before {
+content: '';
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: rgba(0, 0, 0, 0.1); /* Dark overlay */
+backdrop-filter: blur(2px); /* Blur effect */
+z-index: 1;
+}
+
+/* Hero Content */
+.hero-content {
+position: relative;
+z-index: 2;
+text-align: center;
+}
+
+/* Font Styles */
+.hero-content h1 {
+font-size: 3.5rem;
+font-weight: 700;
+margin-bottom: 20px;
+text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Text shadow for better readability */
+}
+
+.hero-content p {
+font-size: 1.25rem;
+font-weight: 300;
+margin-bottom: 30px;
+text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5); /* Text shadow for better readability */
+}
+
+/* Product Card Hover Effect */
+.product-card {
+transition: transform 0.3s;
+height: 100%;
+}
+
+.product-card:hover {
+transform: translateY(-5px);
+}
+</style>
+</head>
+<body>
+<!-- Include this script at the top of your HTML files -->
+<script>
+// Fetch and inject the navigation bar
+fetch('navbar.html')
+.then(response => response.text())
+.then(data => {
+  document.body.insertAdjacentHTML('afterbegin', data);
+});
+</script>
+
+<!-- Hero Section -->
+<section class="hero-section">
+<div class="hero-content">
+<h1>Find Your Textbooks</h1>
+<p>Buy or sell used textbooks at affordable prices.</p>
+</div>
+</section>
+
+<!-- Textbooks Listings -->
+<section class="py-5">
+<div class="container">
+<h2 class="text-center mb-4">Available Textbooks</h2>
+<div class="row g-4" id="itemsContainer">
+  <!-- Items will be loaded dynamically here -->
+</div>
+</div>
+</section>
+
+<!-- Footer -->
+<footer class="footer bg-dark text-white py-4">
+<div class="container text-center">
+<p>&copy; 2025 Student MarketPlace. All rights reserved.</p>
+</div>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Cart Functionality -->
+<script>
+// Initialize cart in localStorage if it doesn't exist
+if (!localStorage.getItem('cart')) {
+localStorage.setItem('cart', JSON.stringify([]));
+}
+
+// Add to Cart Functionality
+document.querySelectorAll('.add-to-cart').forEach(button => {
+button.addEventListener('click', () => {
+  const product = {
+    name: button.getAttribute('data-name'),
+    price: button.getAttribute('data-price'),
+  };
+
+  // Get the current cart from localStorage
+  const cart = JSON.parse(localStorage.getItem('cart'));
+
+  // Add the product to the cart
+  cart.push(product);
+
+  // Save the updated cart back to localStorage
+  localStorage.setItem('cart', JSON.stringify(cart));
+
+  // Optional: Notify the user
+  alert(`${product.name} has been added to your cart!`);
+});
+});
+</script>
+
+<!-- Add Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+<!-- Add API Config -->
+<script src="js/api-config.js"></script>
+
+<!-- Add our auth.js file -->
+<script src="js/auth.js"></script>
+
+<!-- Add items.js file -->
+<script src="js/items.js"></script>
+
+<script>
+    // Load textbooks when the page loads
+    document.addEventListener('DOMContentLoaded', async function() {
+        await loadItemsByCategory('textbooks');
+    });
+</script>
+</body>
+</html>

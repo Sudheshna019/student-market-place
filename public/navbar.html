@@ -1,0 +1,57 @@
+<!-- navbar.html -->
+<header>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top shadow-sm">
+    <div class="container">
+      <a class="navbar-brand fw-bold text-primary" href="index.html"> <i class="fas fa-graduation-cap"></i> Student MarketPlace</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">Home</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="categoriesDropdown" role="button" data-bs-toggle="dropdown">
+              Categories
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="categoriesDropdown">
+              <li><a class="dropdown-item" href="textbooks.html">Textbooks</a></li>
+              <li><a class="dropdown-item" href="gadgets.html">Gadgets</a></li>
+              <li><a class="dropdown-item" href="sationary.html">Stationery</a></li>
+              <li><a class="dropdown-item" href="Labequipments.html">Lab Equipment</a></li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link btn btn-link" data-bs-toggle="modal" data-bs-target="#sellItemModal" id="sellItemButton" disabled>Sell Items</button>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="ContactUs.html">Contact Us</a>
+          </li>
+          <li class="nav-item">
+            <button class="btn btn-outline-danger me-2" id="logoutButton" style="display: none;" onclick="logout()">
+              <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+          </li>
+        </ul>
+        <form class="d-flex me-2">
+          <div class="input-group">
+            <input class="form-control" type="search" id="searchInput" placeholder="Search products..." aria-label="Search">
+            <button class="btn btn-outline-primary" type="button" id="searchButton"><i class="fas fa-search"></i></button>
+          </div>
+        </form>
+        <div id="accountSection" class="d-flex">
+          <button class="btn btn-outline-secondary me-2" data-bs-toggle="modal" data-bs-target="#loginModal">
+            <i class="fas fa-user"></i> Account
+          </button>
+          <a href="cart.html" class="btn btn-primary position-relative">
+            <i class="fas fa-shopping-cart"></i>
+            <span id="cartCount" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display: none;">
+              0
+            </span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>

@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student MarketPlace</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom Styles */
+        .hero-section {
+            background: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), url('./IMAGES2/cover\(stationary\).avif');
+            background-size: cover;
+            background-position: center;
+            color: rgb(14, 14, 14);
+            padding: 100px 0;
+        }
+
+        .category-card {
+            transition: transform 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .product-card {
+            transition: transform 0.3s;
+            height: 100%;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .footer {
+            background-color: #343a40;
+            color: white;
+            padding: 50px 0 20px;
+        }
+
+        .social-icon {
+            font-size: 1.5rem;
+            margin-right: 15px;
+            color: white;
+        }
+
+        .nav-link.active {
+            font-weight: bold;
+        }
+
+        /* Add this to your existing styles */
+        .password-field {
+            position: relative;
+        }
+        .password-toggle {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: none;
+            background: none;
+            cursor: pointer;
+            color: #6c757d;
+        }
+        .password-toggle:hover {
+            color: #0d6efd;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top shadow-sm">
+            <div class="container">
+                <a class="navbar-brand fw-bold text-primary" href="#"> <i class="fas fa-graduation-cap"></i> Student
+                    MarketPlace</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">Home</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="categoriesDropdown" role="button"
+                                data-bs-toggle="dropdown">
+                                Categories
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="categoriesDropdown">
+                                <li><a class="dropdown-item" href="textbooks.html">Textbooks</a></li>
+                                <li><a class="dropdown-item" href="gadgets.html">Gadgets</a></li>
+                                <li><a class="dropdown-item" href="sationary.html">Stationery</a></li>
+                                <li><a class="dropdown-item" href="Labequipments.html">Lab Equipment</a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link btn btn-link" data-bs-toggle="modal"
+                                data-bs-target="#sellItemModal">Sell Items</button>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="ContactUs.html">Contact Us</a>
+                        </li>
+                        <li class="btn btn-outline-danger me-2" id="logoutButton" style="display: none;">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </li>
+                    </ul>
+                    <form class="d-flex me-2">
+                        <div class="input-group">
+                            <input class="form-control" type="search" id="searchInput" placeholder="Search products..."
+                                aria-label="Search">
+                            <button class="btn btn-outline-primary" type="button" id="searchButton"><i
+                                    class="fas fa-search"></i></button>
+                        </div>
+                    </form>
+                    <div id="accountSection" class="d-flex">
+                        <button class="btn btn-outline-secondary me-2" data-bs-toggle="modal"
+                            data-bs-target="#loginModal">
+                            <i class="fas fa-user"></i> Account
+                        </button>                        <a href="cart.html" class="btn btn-primary position-relative">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span id="cartCount"
+                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                                style="display: none; font-size: 0.75rem; padding: 0.25em 0.6em;">
+                                0
+                            </span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Login -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="loginModalLabel">Login to Your Account</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="modal-form" id="loginForm">
+                        <div class="mb-3">
+                            <label for="loginEmail" class="form-label">Email address</label>
+                            <input type="email" class="form-control" id="loginEmail" required placeholder="Enter email">
+                        </div>
+                        <div class="mb-3 password-field">
+                            <label for="loginPassword" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="loginPassword" required placeholder="Enter password">
+                            <button type="button" class="password-toggle" onclick="togglePassword('loginPassword', this)">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="rememberMe">
+                            <label class="form-check-label" for="rememberMe">Remember me</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Login</button>
+                    </form>
+                    <div class="form-switch-container">
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#registerModal" data-bs-dismiss="modal">Create an account</a>
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal" data-bs-dismiss="modal">Forgot password?</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Registration-->
+    <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="registerModalLabel">Create New Account</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="modal-form" id="registerForm">
+                        <div class="mb-3">
+                            <label for="registerName" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="registerName" required
+                                placeholder="Enter full name">
+                        </div>
+                        <div class="mb-3">
+                            <label for="registerEmail" class="form-label">Email address</label>
+                            <input type="email" class="form-control" id="registerEmail" required
+                                placeholder="Enter email">
+                        </div>
+                        <div class="mb-3 password-field">
+                            <label for="registerPassword" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="registerPassword" required placeholder="Create password">
+                            <button type="button" class="password-toggle" onclick="togglePassword('registerPassword', this)">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="mb-3 password-field">
+                            <label for="confirmPassword" class="form-label">Confirm Password</label>
+                            <input type="password" class="form-control" id="confirmPassword" required placeholder="Confirm password">
+                            <button type="button" class="password-toggle" onclick="togglePassword('confirmPassword', this)">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Register</button>
+                    </form>
+                    <div class="form-switch-container">
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#loginModal" data-bs-dismiss="modal">Already
+                            have an account?</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </nav>
+    </header>
+
+    <section class="hero-section mt-5">
+        <div class="container text-center position-relative">
+            <!-- Background Image -->
+            <div class="hero-background" style="
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: url('') no-repeat center center/cover;
+filter: blur(1px);
+z-index: -1;
+"></div>
+
+            <!-- Dark Overlay -->
+            <div class="hero-overlay" style="
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: rgba(0, 0, 0, 0.1);
+z-index: 0;
+"></div>
+            <div class="hero-content position-relative" style="z-index: 1;">
+                <h1 class="display-4 fw-bold">Welcome to Student MarketPlace</h1>
+                <p class="lead mb-4">Buy, Sell academic items securely here!</p>
+                <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center mb-5">Shop by Category</h2>
+            <div class="row g-4">
+                <!-- Textbooks -->
+                <div class="col-6 col-md-4 col-lg-2">
+                    <div class="card category-card h-100 shadow-sm">
+                        <img src="./IMAGES2/textbookss.png" class="card-img-top" alt="Textbooks">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Textbooks</h5>
+                            <a href="textbooks.html" class="stretched-link"></a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Gadgets -->
+                <div class="col-6 col-md-4 col-lg-2">
+                    <div class="card category-card h-100 shadow-sm">
+                        <img src="./IMAGES2//Gadjets.png" class="card-img-top" alt="Gadgets">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Gadgets</h5>
+                            <a href="gadgets.html" class="stretched-link"></a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Stationery -->
+                <div class="col-6 col-md-4 col-lg-2">
+                    <div class="card category-card h-100 shadow-sm">
+                        <img src="./IMAGES2/sationaryim.png" class="card-img-top" alt="Stationery" height="165">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Stationery</h5>
+                            <a href="sationary.html" class="stretched-link"></a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Lab Equipment -->
+                <div class="col-6 col-md-4 col-lg-2">
+                    <div class="card category-card h-100 shadow-sm">
+                        <img src="./IMAGES2/labequi.png" class="card-img-top" alt="Lab Equipment">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Lab Equipment</h5>
+                            <a href="Labequipments.html" class="stretched-link"></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Products -->
+    <section class="py-5">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Featured Products</h2>
+                <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#sellItemModal"
+                    id="sellItemButton" disabled>
+                    <i class="fas fa-plus"></i> Sell Item
+                </button>
+            </div>
+            <div class="row g-4" id="itemsContainer">
+                <!-- Items will be loaded dynamically here -->
+            </div>
+        </div>
+    </section>
+    <footer class="footer bg-dark text-white py-4">
+        <div class="container text-center">
+            <p>© 2025 Student MarketPlace. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Add Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+
+    <!-- Add jQuery for modal handling -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Add Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Add API Config -->
+    <script src="js/api-config.js"></script>
+
+    <!-- Add our auth.js file -->
+    <script src="js/auth.js"></script>
+
+    <!-- Add items.js file -->
+    <script src="js/items.js"></script>
+
+    <!-- Add validations.js file -->
+    <script src="js/validations.js"></script>
+
+    <script>
+
+        auth.onAuthStateChanged((user) => {
+            const logoutButton = document.getElementById('logoutButton');
+            const sellItemButton = document.getElementById('sellItemButton');
+            const accountButton = document.querySelector('[data-bs-target="#loginModal"]');
+
+            if (user) {
+                // User is signed in
+                logoutButton.style.display = 'block';
+                sellItemButton.disabled = false;
+                accountButton.innerHTML = '<i class="fas fa-user"></i> Profile';
+                accountButton.setAttribute('data-bs-target', '#profileModal');
+                updateCartCount();
+            } else {
+                // User is signed out
+                logoutButton.style.display = 'none';
+                sellItemButton.disabled = true;
+                accountButton.innerHTML = '<i class="fas fa-user"></i> Account';
+                accountButton.setAttribute('data-bs-target', '#loginModal');
+                const cartCountElement = document.getElementById('cartCount');
+                if (cartCountElement) {
+                    cartCountElement.style.display = 'none';
+                }
+            }
+        });
+
+        document.getElementById('logoutButton').addEventListener('click', async () => {
+            try {
+                await auth.signOut();
+                showAlert('success', 'Logged out successfully');
+            } catch (error) {
+                console.error('Error signing out:', error);
+                showAlert('danger', 'Failed to logout. Please try again.');
+            }
+        });
+        // Function to update cart count
+        async function updateCartCount() {
+            try {
+                const currentUser = auth.currentUser;
+                const cartCountElement = document.getElementById('cartCount');
+
+                if (!currentUser || !cartCountElement) {
+                    if (cartCountElement) {
+                        cartCountElement.style.display = 'none';
+                    }
+                    return;
+                }
+
+                const cartRef = db.collection('carts').doc(currentUser.uid);
+                const cartDoc = await cartRef.get();
+
+                if (cartDoc.exists) {
+                    const cartData = cartDoc.data();
+                    const count = Object.keys(cartData.items || {}).length;
+
+                    if (count > 0) {
+                        cartCountElement.textContent = count;
+                        cartCountElement.style.display = 'block';
+                        cartCountElement.style.visibility = 'visible';
+                    } else {
+                        cartCountElement.style.display = 'none';
+                    }
+                } else {
+                    cartCountElement.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error updating cart count:', error);
+            }
+        }
+
+        // Update cart count when auth state changes
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                updateCartCount();
+            } else {
+                const cartCountElement = document.getElementById('cartCount');
+                if (cartCountElement) {
+                    cartCountElement.style.display = 'none';
+                }
+            }
+        });
+
+        // Update cart count when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            updateCartCount();
+
+            // Add event listeners only if elements exist
+            const searchButton = document.getElementById('searchButton');
+            const searchInput = document.getElementById('searchInput');
+            const sellItemForm = document.getElementById('sellItemForm');
+
+            if (searchButton) {
+                searchButton.addEventListener('click', handleSearch);
+            }
+
+            if (searchInput) {
+                searchInput.addEventListener('keypress', function (e) {
+                    if (e.key === 'Enter') {
+                        handleSearch();
+                    }
+                });
+            }
+
+            if (sellItemForm) {
+                sellItemForm.addEventListener('submit', async function (e) {
+                    e.preventDefault();
+
+                    const itemData = {
+                        name: document.getElementById('itemName').value.trim(),
+                        category: document.getElementById('itemCategory').value,
+                        condition: document.getElementById('itemCondition').value,
+                        description: document.getElementById('itemDescription').value.trim(),
+                        price: document.getElementById('itemPrice').value,
+                        image: document.getElementById('itemImage').files[0]
+                    };
+
+                    // Validate required fields
+                    if (!itemData.name || !itemData.category || !itemData.description || !itemData.price || !itemData.image) {
+                        showAlert('danger', 'Please fill in all required fields');
+                        return;
+                    }
+
+                    try {
+                        // Add item using the Firebase function
+                        const success = await addItemForSale(itemData);
+
+                        if (success) {
+                            // Reset form and close modal
+                            document.getElementById('sellItemForm').reset();
+                            const modal = bootstrap.Modal.getInstance(document.getElementById('sellItemModal'));
+                            modal.hide();
+
+                            // Refresh the items display
+                            if (window.location.pathname === '/' || window.location.pathname === '/index.html') {
+                                await loadAllItems();
+                            } else {
+                                await loadItemsByCategory(itemData.category);
+                            }
+
+                            showAlert('success', 'Item listed successfully!');
+                        }
+                    } catch (error) {
+                        console.error('Error listing item:', error);
+                        showAlert('danger', 'Failed to list item. Please try again.');
+                    }
+                });
+            }
+        });
+
+        // Add event listener for cart updates
+        db.collection('carts').onSnapshot((snapshot) => {
+            updateCartCount();
+        });
+
+        // Load items when the page loads
+        document.addEventListener('DOMContentLoaded', async function () {
+            await loadItems();
+        });
+
+        async function loadAllItems() {
+            await loadItems();
+        }
+
+        // Handle category navigation
+        document.querySelectorAll('.category-link').forEach(link => {
+            link.addEventListener('click', async function (e) {
+                e.preventDefault();
+                const category = this.getAttribute('data-category');
+                await loadItemsByCategory(category);
+            });
+        });
+
+        // Show alert function
+        function showAlert(type, message) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3`;
+            alertDiv.style.zIndex = '9999';
+            alertDiv.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+            document.body.appendChild(alertDiv);
+
+            // Remove alert after 5 seconds
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+
+        // Search functionality
+        document.getElementById('searchButton').addEventListener('click', handleSearch);
+        document.getElementById('searchInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                handleSearch();
+            }
+        });
+
+        async function handleSearch() {
+            const searchInput = document.getElementById('searchInput');
+            const searchTerm = searchInput.value.trim();
+            
+            // Validate search input
+            const validation = validations.validateSearchInput(searchTerm);
+            if (!validation.isValid) {
+                showAlert('danger', validation.message);
+                return;
+            }
+
+            try {
+                const itemsRef = db.collection('items')
+                    .where('status', '==', 'available')
+                    .orderBy('createdAt', 'desc');
+
+                const snapshot = await itemsRef.get();
+                const itemsContainer = document.getElementById('itemsContainer');
+                itemsContainer.innerHTML = '';
+
+                if (snapshot.empty) {
+                    itemsContainer.innerHTML = '<div class="col-12 text-center py-4">No items found</div>';
+                    return;
+                }
+
+                let foundItems = false;
+                snapshot.forEach(doc => {
+                    const item = doc.data();
+                    // Search in name, category, and description
+                    if (item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                        item.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                        item.description.toLowerCase().includes(searchTerm.toLowerCase())) {
+                        const itemElement = createItemCard(item, doc.id);
+                        itemsContainer.appendChild(itemElement);
+                        foundItems = true;
+                    }
+                });
+
+                if (!foundItems) {
+                    itemsContainer.innerHTML = '<div class="col-12 text-center py-4">No items found matching your search</div>';
+                }
+            } catch (error) {
+                console.error('Error searching items:', error);
+                showAlert('danger', 'Failed to search items. Please try again.');
+            }
+        }
+
+        // Add this JavaScript function
+        function togglePassword(inputId, button) {
+            const input = document.getElementById(inputId);
+            const icon = button.querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+    </script>
+
+    <!-- Sell Item Modal -->
+    <div class="modal fade" id="sellItemModal" tabindex="-1" aria-labelledby="sellItemModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="sellItemModalLabel">List Item for Sale</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="sellItemForm">
+                        <div class="mb-3">
+                            <label for="itemImage" class="form-label">Item Image</label>
+                            <input type="file" class="form-control" id="itemImage" accept="image/*" required>
+                            <div class="form-text">Upload a clear image of your item (max 5MB)</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="itemName" class="form-label">Item Name</label>
+                            <input type="text" class="form-control" id="itemName" required
+                                placeholder="Enter item name">
+                        </div>
+                        <div class="mb-3">
+                            <label for="itemCategory" class="form-label">Category</label>
+                            <select class="form-select" id="itemCategory" required>
+                                <option value="">Select category</option>
+                                <option value="textbooks">Textbooks</option>
+                                <option value="gadgets">Gadgets</option>
+                                <option value="stationery">Stationery</option>
+                                <option value="lab-equipment">Lab Equipment</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="itemPrice" class="form-label">Price (₹)</label>
+                            <input type="number" class="form-control" id="itemPrice" required min="0" step="0.01"
+                                placeholder="Enter price">
+                        </div>
+                        <div class="mb-3">
+                            <label for="itemCondition" class="form-label">Condition</label>
+                            <select class="form-select" id="itemCondition" required>
+                                <option value="New">New</option>
+                                <option value="Like New">Like New</option>
+                                <option value="Good">Good</option>
+                                <option value="Fair">Fair</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="itemDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="itemDescription" rows="3" required
+                                placeholder="Describe your item"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">List Item</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="profileModalLabel">My Profile</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-4">
+                        <div class="profile-image-container mb-3">
+                            <img id="profileImage"
+                                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150' viewBox='0 0 24 24' fill='%23cccccc'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/%3E%3C/svg%3E"
+                                class="rounded-circle" alt="Profile Image"
+                                style="width: 150px; height: 150px; object-fit: cover;">
+                        </div>
+                        <h4 id="profileName" class="mb-1"></h4>
+                        <p id="profileEmail" class="text-muted"></p>
+                    </div>
+                    <div class="list-group">
+                        <a href="#" class="list-group-item list-group-item-action" data-bs-toggle="modal"
+                            data-bs-target="#ordersModal">
+                            <i class="fas fa-shopping-bag me-2"></i> My Orders
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action" data-bs-toggle="modal"
+                            data-bs-target="#listingsModal">
+                            <i class="fas fa-list me-2"></i> My Listings
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action" data-bs-toggle="modal"
+                            data-bs-target="#editProfileModal">
+                            <i class="fas fa-user-edit me-2"></i> Edit Profile
+                        </a>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger" onclick="logout()">Logout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Orders Modal -->
+    <div class="modal fade" id="ordersModal" tabindex="-1" aria-labelledby="ordersModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="ordersModalLabel">My Orders</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="ordersList" class="list-group">
+                        <!-- Orders will be loaded dynamically here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Listings Modal -->
+    <div class="modal fade" id="listingsModal" tabindex="-1" aria-labelledby="listingsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="listingsModalLabel">My Listings</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="listingsList" class="list-group">
+                        <!-- Listings will be loaded dynamically here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editProfileModalLabel">Edit Profile</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editProfileForm">
+                        <div class="mb-3">
+                            <label for="editProfileImage" class="form-label">Profile Image</label>
+                            <input type="file" class="form-control" id="editProfileImage" accept="image/*">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editProfileName" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="editProfileName" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Save Changes</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+        <div class="container">
+            <div class="collapse navbar-collapse" id="categoryNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="?category=textbooks">Textbooks</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="?category=gadgets">Gadgets</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="?category=stationery">Stationery</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="?category=lab-equipment">Lab Equipment</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Items Container -->
+    <div class="container">
+        <div class="row g-4" id="itemsContainer">
+            <!-- Items will be loaded dynamically here -->
+        </div>
+    </div>
+
+    <!-- Add favicon -->
+    <link rel="icon"
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23000'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/%3E%3C/svg%3E"
+        type="image/svg+xml">
+
+    <!-- Forgot Password Modal -->
+    <div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="forgotPasswordModalLabel">Reset Password</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="forgotPasswordForm">
+                        <div class="mb-3">
+                            <label for="resetEmail" class="form-label">Email address</label>
+                            <input type="email" class="form-control" id="resetEmail" required placeholder="Enter your email">
+                            <div class="form-text">We'll send you a link to reset your password.</div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Send Reset Link</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add this to your existing script section
+        document.getElementById('forgotPasswordForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('resetEmail').value;
+
+            try {
+                await auth.sendPasswordResetEmail(email);
+                showAlert('success', 'Password reset email sent! Please check your inbox.');
+                const modal = bootstrap.Modal.getInstance(document.getElementById('forgotPasswordModal'));
+                modal.hide();
+            } catch (error) {
+                console.error('Error sending password reset email:', error);
+                showAlert('danger', 'Failed to send reset email. Please try again.');
+            }
+        });
+    </script>
+</body>
+
+</html>
