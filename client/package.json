@@ -1,0 +1,23 @@
+{
+  "name": "student-marketplace-client",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^7.3.1",
+    "bootstrap": "^5.3.8",
+    "react": "^19.3.0",
+    "react-bootstrap": "^2.10.10",
+    "react-dom": "^19.3.0",
+    "react-router": "^7.18.4"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.1.1",
+    "vite": "^8.3.1"
+  }
+}

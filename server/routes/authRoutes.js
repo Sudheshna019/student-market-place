@@ -1,128 +1,117 @@
 const express = require('express');
-const router = express.Router();
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const { protect } = require('../middleware/authMiddleware');
+const { protect, generateToken } = require('../middleware/authMiddleware');
+const { authLimiter } = require('../middleware/rateLimit');
+const { str, isEmail, isPhone, isImageDataUrl } = require('../utils/validate');
 
-const generateToken = (id) => {
-    return jwt.sign({ id }, process.env.JWT_SECRET || 'student_marketplace_super_secret_jwt_key_2026', {
-        expiresIn: '30d'
+const router = express.Router();
+
+const MIN_PASSWORD = 6;
+const MAX_PROFILE_PHOTO = 400 * 1024;
+
+function authResponse(user) {
+    return { token: generateToken(user._id), user: user.toPublic() };
+}
+
+// POST /api/auth/register
+router.post('/register', authLimiter, async (req, res) => {
+    const fullName = str(req.body.fullName);
+    const email = str(req.body.email).toLowerCase();
+    const password = typeof req.body.password === 'string' ? req.body.password : '';
+
+    if (fullName.length < 2 || fullName.length > 60) {
+        return res.status(400).json({ message: 'Full name must be 2-60 characters' });
+    }
+    if (!isEmail(email)) {
+        return res.status(400).json({ message: 'Enter a valid email address' });
+    }
+    if (password.length < MIN_PASSWORD) {
+        return res.status(400).json({ message: `Password must be at least ${MIN_PASSWORD} characters` });
+    }
+
+    if (await User.exists({ email })) {
+        return res.status(400).json({ message: 'An account with this email already exists' });
+    }
+
+    const user = await User.create({
+        fullName,
+        email,
+        password: await bcrypt.hash(password, 10)
     });
-};
 
-// @route   POST /api/auth/register
-// @desc    Register a new user
-router.post('/register', async (req, res) => {
-    try {
-        const { fullName, email, password } = req.body;
-
-        if (!fullName || !email || !password) {
-            return res.status(400).json({ message: 'Please enter all fields' });
-        }
-
-        const existingUser = await User.findOne({ email: email.toLowerCase() });
-        if (existingUser) {
-            return res.status(400).json({ message: 'User with this email already exists' });
-        }
-
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
-
-        const user = await User.create({
-            fullName,
-            email: email.toLowerCase(),
-            password: hashedPassword
-        });
-
-        res.status(201).json({
-            _id: user._id,
-            fullName: user.fullName,
-            email: user.email,
-            role: user.role,
-            photoURL: user.photoURL,
-            token: generateToken(user._id)
-        });
-    } catch (error) {
-        console.error('Register Error:', error);
-        res.status(500).json({ message: 'Server error during registration' });
-    }
+    res.status(201).json(authResponse(user));
 });
 
-// @route   POST /api/auth/login
-// @desc    Authenticate user & get token
-router.post('/login', async (req, res) => {
-    try {
-        const { email, password } = req.body;
+// POST /api/auth/login
+router.post('/login', authLimiter, async (req, res) => {
+    const email = str(req.body.email).toLowerCase();
+    const password = typeof req.body.password === 'string' ? req.body.password : '';
 
-        if (!email || !password) {
-            return res.status(400).json({ message: 'Please provide email and password' });
-        }
-
-        const user = await User.findOne({ email: email.toLowerCase() });
-        if (!user) {
-            return res.status(400).json({ message: 'Invalid credentials' });
-        }
-
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            return res.status(400).json({ message: 'Invalid credentials' });
-        }
-
-        res.json({
-            _id: user._id,
-            fullName: user.fullName,
-            email: user.email,
-            role: user.role,
-            photoURL: user.photoURL,
-            token: generateToken(user._id)
-        });
-    } catch (error) {
-        console.error('Login Error:', error);
-        res.status(500).json({ message: 'Server error during login' });
+    if (!email || !password) {
+        return res.status(400).json({ message: 'Please enter your email and password' });
     }
+
+    const user = await User.findOne({ email }).select('+password');
+    if (!user || !(await bcrypt.compare(password, user.password))) {
+        return res.status(400).json({ message: 'Invalid email or password' });
+    }
+
+    res.json(authResponse(user));
 });
 
-// @route   GET /api/auth/me
-// @desc    Get current user profile
-router.get('/me', protect, async (req, res) => {
-    try {
-        const user = await User.findById(req.user._id).select('-password');
-        res.json(user);
-    } catch (error) {
-        res.status(500).json({ message: 'Server error fetching profile' });
-    }
+// GET /api/auth/me
+router.get('/me', protect, (req, res) => {
+    res.json({ user: req.user.toPublic() });
 });
 
-// @route   PUT /api/auth/profile
-// @desc    Update user profile
+// PUT /api/auth/profile — name, phone and profile photo
 router.put('/profile', protect, async (req, res) => {
-    try {
-        const user = await User.findById(req.user._id);
-        if (!user) return res.status(404).json({ message: 'User not found' });
+    const { fullName, phone, photoURL } = req.body;
 
-        if (req.body.fullName) user.fullName = req.body.fullName;
-        if (req.body.photoURL) user.photoURL = req.body.photoURL;
-        if (req.body.phone) user.phone = req.body.phone;
-
-        if (req.body.password) {
-            const salt = await bcrypt.genSalt(10);
-            user.password = await bcrypt.hash(req.body.password, salt);
+    if (fullName !== undefined) {
+        const name = str(fullName);
+        if (name.length < 2 || name.length > 60) {
+            return res.status(400).json({ message: 'Full name must be 2-60 characters' });
         }
-
-        const updatedUser = await user.save();
-        res.json({
-            _id: updatedUser._id,
-            fullName: updatedUser.fullName,
-            email: updatedUser.email,
-            role: updatedUser.role,
-            photoURL: updatedUser.photoURL,
-            phone: updatedUser.phone,
-            token: generateToken(updatedUser._id)
-        });
-    } catch (error) {
-        res.status(500).json({ message: 'Error updating profile' });
+        req.user.fullName = name;
     }
+
+    if (phone !== undefined) {
+        const value = str(phone);
+        if (value && !isPhone(value)) {
+            return res.status(400).json({ message: 'Enter a valid 10-digit mobile number' });
+        }
+        req.user.phone = value;
+    }
+
+    if (photoURL !== undefined) {
+        if (photoURL !== '' && (!isImageDataUrl(photoURL) || photoURL.length > MAX_PROFILE_PHOTO)) {
+            return res.status(400).json({ message: 'Profile photo must be an image under 300 KB' });
+        }
+        req.user.photoURL = photoURL;
+    }
+
+    await req.user.save();
+    res.json({ user: req.user.toPublic() });
+});
+
+// PUT /api/auth/password
+router.put('/password', protect, authLimiter, async (req, res) => {
+    const { currentPassword, newPassword } = req.body;
+
+    if (typeof newPassword !== 'string' || newPassword.length < MIN_PASSWORD) {
+        return res.status(400).json({ message: `New password must be at least ${MIN_PASSWORD} characters` });
+    }
+
+    const user = await User.findById(req.user._id).select('+password');
+    if (typeof currentPassword !== 'string' || !(await bcrypt.compare(currentPassword, user.password))) {
+        return res.status(400).json({ message: 'Current password is incorrect' });
+    }
+
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+    res.json({ message: 'Password updated successfully' });
 });
 
 module.exports = router;

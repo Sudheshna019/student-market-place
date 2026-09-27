@@ -1,186 +1,99 @@
-# Student Marketplace - Project Documentation
+# Student MarketPlace
 
-## Project Overview
-The Student Marketplace is a web application designed to facilitate buying and selling of academic items among students. The platform provides a secure and user-friendly environment for students to list, browse, and purchase various academic items including textbooks, gadgets, stationery, and lab equipment.
+A campus marketplace where students **buy, sell and borrow** academic items: textbooks, gadgets, stationery and lab equipment.
 
-## Technology Stack
-- **Frontend**: HTML5, CSS3, JavaScript, Bootstrap 5
-- **Backend**: Firebase
-  - Authentication: Firebase Authentication
-  - Database: Cloud Firestore
-  - Storage: Firebase Storage
-  - Hosting: Firebase Hosting
+Built with the **MERN stack**: MongoDB, Express, React and Node.js. Deployed on Vercel.
 
-## Key Features
-1. **User Authentication**
-   - Secure registration and login system
-   - Password reset functionality
-   - Profile management
-   - Session management
+## Features
 
-2. **Product Management**
-   - Listing items for sale
-   - Categorized product browsing
-   - Search functionality
-   - Product details and images
+**Students**
+- Register and log in with JWT auth and a "Remember me" option
+- Browse 4 categories, filter by *For Sale* / *For Borrow*, and search listings
+- List items **for sale** or **for lending**. A lending listing has a rent, a refundable deposit and a borrow period. Photos are compressed in the browser before upload.
+- Edit, relist, mark as sold/borrowed, or delete your listings
+- Cart and checkout with **Cash on Delivery**. Prices and totals are always calculated on the server.
+- Checkout creates one order per seller, so each seller manages their own order
+- Order tracking: `pending → confirmed → delivered` (or `cancelled`, which puts the items back on sale)
+- Profile page: photo, name, phone, and change password
+- Contact form
 
-3. **Shopping Cart**
-   - Add/remove items
-   - Quantity management
-   - Real-time cart updates
+**Admin panel** (`/admin`)
+- Dashboard with stats and recent orders
+- Manage users (promote/demote admins), remove listings, update order status, read contact messages
 
-4. **Order Management**
-   - Order placement
-   - Order tracking
-   - Order history
-   - Order details view
+## Tech stack
 
-5. **User Interface**
-   - Responsive design
-   - Modern UI with Bootstrap
-   - Intuitive navigation
-   - Form validation
+| Layer | Tech |
+| --- | --- |
+| Frontend | React 19, React Router 7, React-Bootstrap / Bootstrap 5, Font Awesome, Vite |
+| Backend | Node.js, Express 5, Mongoose 9, JWT, bcrypt, express-rate-limit |
+| Database | MongoDB Atlas |
+| Hosting | Vercel: static React build plus the Express API as a serverless function |
 
-## Implementation Details
+## Project structure
 
-### 1. Authentication System
-- Implemented using Firebase Authentication
-- Features:
-  - Email/password authentication
-  - Password reset functionality
-  - Session persistence
-  - Secure password requirements
-  - Input validation for all forms
+```
+├── api/index.js        # Vercel serverless entry → exports the Express app
+├── client/             # React app (Vite)
+│   ├── public/images/  # Hero and category images
+│   └── src/
+│       ├── components/ # Navbar, modals, item cards, etc.
+│       ├── context/    # Auth, cart, alerts and modal state
+│       └── pages/      # Home, Category, Cart, Checkout, Orders, Profile, admin/…
+├── server/             # Express API
+│   ├── app.js          # Express app (routes, error handling)
+│   ├── server.js       # Local dev entry (app.listen)
+│   ├── models/         # User, Item, Cart, Order, ContactMessage
+│   ├── routes/         # auth, items, cart, orders, contact, admin
+│   └── scripts/        # seed.js (demo data), makeAdmin.js
+└── vercel.json
+```
 
-### 2. Database Structure
-- Cloud Firestore collections:
-  - `users`: User profiles and preferences
-  - `items`: Product listings
-  - `carts`: Shopping cart data
-  - `orders`: Order information
-  - `categories`: Product categories
+## Run locally
 
-### 3. Security Implementation
-- Firebase Security Rules for:
-  - Data access control
-  - User authentication
-  - File upload restrictions
-- Input validation for all forms
-- XSS protection
-- CSRF protection
+Requires Node.js 20.19+ and a MongoDB connection string (a free MongoDB Atlas cluster works).
 
-### 4. Performance Optimization
-- Image optimization
-- Lazy loading
-- Caching strategies
-- Database indexing
-- Code minification
+```bash
+npm install
+cp server/.env.example server/.env   # then fill in MONGO_URI and JWT_SECRET
+npm run seed                         # optional: adds a demo seller and 12 sample listings
+npm run dev                          # API on :5000, React on http://localhost:5173
+```
 
-## Deployment Process
+Make yourself an admin: register on the site, then run
 
-### 1. Firebase Setup
-1. Create a Firebase project
-2. Enable required services:
-   - Authentication
-   - Firestore Database
-   - Storage
-   - Hosting
+```bash
+npm run make-admin -- you@example.com
+```
 
-### 2. Configuration
-1. Set up Firebase configuration:
-   ```javascript
-   const firebaseConfig = {
-     apiKey: "YOUR_API_KEY",
-     authDomain: "YOUR_AUTH_DOMAIN",
-     projectId: "YOUR_PROJECT_ID",
-     storageBucket: "YOUR_STORAGE_BUCKET",
-     messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-     appId: "YOUR_APP_ID"
-   };
-   ```
+## Deploy to Vercel
 
-2. Configure security rules:
-   - Firestore rules
-   - Storage rules
-   - Authentication settings
+1. Push this repository to GitHub.
+2. On [vercel.com](https://vercel.com), click **Add New → Project** and import the repo. Leave the build settings as they are; `vercel.json` sets them.
+3. Under **Environment Variables**, add:
+   - `MONGO_URI`: your MongoDB Atlas connection string
+   - `JWT_SECRET`: a long random string
+4. Click **Deploy**.
+5. In MongoDB Atlas → **Network Access**, allow `0.0.0.0/0`. Vercel's servers don't have fixed IP addresses.
 
-### 3. Deployment Steps
-1. Install Firebase CLI:
-   ```bash
-   npm install -g firebase-tools
-   ```
+## API overview
 
-2. Initialize Firebase project:
-   ```bash
-   firebase init
-   ```
+| Method | Endpoint | Access |
+| --- | --- | --- |
+| POST | `/api/auth/register`, `/api/auth/login` | Public |
+| GET / PUT | `/api/auth/me`, `/api/auth/profile`, `/api/auth/password` | Logged in |
+| GET | `/api/items?category=&type=&search=`, `/api/items/:id`, `/api/items/:id/image` | Public |
+| POST / PUT / DELETE | `/api/items`, `/api/items/:id` | Owner or admin |
+| GET / POST / DELETE | `/api/cart`, `/api/cart/:itemId` | Logged in |
+| POST / GET | `/api/orders`, `/api/orders/my-orders`, `/api/orders/:id` | Buyer, seller or admin |
+| PATCH | `/api/orders/:id/status` | Buyer (cancel) / seller or admin |
+| POST | `/api/contact` | Public |
+| GET / PATCH / DELETE | `/api/admin/...` | Admin |
 
-3. Deploy to Firebase:
-   ```bash
-   firebase deploy
-   ```
+## Future work
 
-### 4. Post-Deployment
-1. Monitor performance using Firebase Console
-2. Set up error tracking
-3. Configure domain settings
-4. Enable SSL certificate
-
-## Monitoring and Maintenance
-
-### 1. Performance Monitoring
-- Firebase Console Dashboard
-- Real-time database monitoring
-- Authentication monitoring
-- Storage usage tracking
-
-### 2. Error Tracking
-- Firebase Crashlytics
-- Console error logging
-- User feedback system
-
-### 3. Regular Maintenance
-- Database optimization
-- Security updates
-- Performance improvements
-- Content updates
-
-## Best Practices Implemented
-
-### 1. Security
-- Input validation
-- Secure authentication
-- Data encryption
-- Regular security audits
-
-### 2. Performance
-- Optimized images
-- Minified code
-- Efficient database queries
-- Caching strategies
-
-### 3. User Experience
-- Responsive design
-- Form validation
-- Error handling
-- Loading states
-
-### 4. Code Quality
-- Modular structure
-- Clean code practices
-- Documentation
-- Version control
-
-## Future Enhancements
-1. Mobile application development
-2. Payment gateway integration
-3. Advanced search features
-4. Social media integration
-5. Review and rating system
-
-## Support and Maintenance
-- Regular updates
-- Bug fixes
-- Feature additions
-- Performance optimization
-- Security patches 
+- Online payments (Razorpay) alongside Cash on Delivery
+- Forgot-password emails and email notifications for orders
+- Image hosting on a CDN (e.g. Cloudinary) instead of MongoDB
+- Buyer–seller chat, and reviews and ratings
+- Pagination and more search filters

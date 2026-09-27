@@ -1,91 +1,73 @@
 const express = require('express');
-const router = express.Router();
 const Cart = require('../models/Cart');
 const Item = require('../models/Item');
 const { protect } = require('../middleware/authMiddleware');
 
-// @route   GET /api/cart
-// @desc    Get user's shopping cart
-router.get('/', protect, async (req, res) => {
-    try {
-        let cart = await Cart.findOne({ userId: req.user._id }).populate('items.itemId');
-        if (!cart) {
-            cart = await Cart.create({ userId: req.user._id, items: [] });
-        }
-        res.json(cart);
-    } catch (error) {
-        console.error('Fetch Cart Error:', error);
-        res.status(500).json({ message: 'Error fetching cart' });
-    }
-});
+const router = express.Router();
 
-// @route   POST /api/cart/add
-// @desc    Add item to shopping cart
-router.post('/add', protect, async (req, res) => {
-    try {
-        const { itemId, quantity = 1 } = req.body;
-        
-        const item = await Item.findById(itemId);
-        if (!item || item.status !== 'available') {
-            return res.status(400).json({ message: 'Item is no longer available' });
-        }
+router.use(protect);
 
-        let cart = await Cart.findOne({ userId: req.user._id });
-        if (!cart) {
-            cart = new Cart({ userId: req.user._id, items: [] });
-        }
+// Returns the cart as a plain list of items. Listings that were deleted are
+// dropped; ones sold to someone else are kept but flagged so the UI can say so.
+async function cartResponse(userId) {
+    const cart = await Cart.findOne({ userId }).populate('items.itemId');
+    if (!cart) return { items: [] };
 
-        const existingItemIndex = cart.items.findIndex(i => i.itemId.toString() === itemId);
-
-        if (existingItemIndex > -1) {
-            cart.items[existingItemIndex].quantity += quantity;
-        } else {
-            cart.items.push({ itemId, quantity });
-        }
-
-        cart.updatedAt = Date.now();
+    const live = cart.items.filter((line) => line.itemId);
+    if (live.length !== cart.items.length) {
+        cart.items = live.map((line) => ({ itemId: line.itemId._id, addedAt: line.addedAt }));
         await cart.save();
-        
-        const populatedCart = await Cart.findById(cart._id).populate('items.itemId');
-        res.json(populatedCart);
-    } catch (error) {
-        console.error('Add to Cart Error:', error);
-        res.status(500).json({ message: 'Error adding item to cart' });
     }
+
+    return {
+        items: live.map((line) => ({
+            ...line.itemId.toJSON(),
+            available: line.itemId.status === 'available'
+        }))
+    };
+}
+
+// GET /api/cart
+router.get('/', async (req, res) => {
+    res.json(await cartResponse(req.user._id));
 });
 
-// @route   POST /api/cart/remove
-// @desc    Remove item from cart
-router.post('/remove', protect, async (req, res) => {
-    try {
-        const { itemId } = req.body;
-        let cart = await Cart.findOne({ userId: req.user._id });
-        if (!cart) return res.status(404).json({ message: 'Cart not found' });
-
-        cart.items = cart.items.filter(i => i.itemId.toString() !== itemId);
-        cart.updatedAt = Date.now();
-        await cart.save();
-
-        const populatedCart = await Cart.findById(cart._id).populate('items.itemId');
-        res.json(populatedCart);
-    } catch (error) {
-        res.status(500).json({ message: 'Error removing item from cart' });
+// POST /api/cart/:itemId
+router.post('/:itemId', async (req, res) => {
+    const item = await Item.findById(req.params.itemId);
+    if (!item) return res.status(404).json({ message: 'Item not found' });
+    if (item.status !== 'available') {
+        return res.status(400).json({ message: 'Sorry, this item is no longer available' });
     }
+    if (item.sellerId.equals(req.user._id)) {
+        return res.status(400).json({ message: "You can't add your own listing to the cart" });
+    }
+
+    const result = await Cart.updateOne(
+        { userId: req.user._id, 'items.itemId': { $ne: item._id } },
+        { $push: { items: { itemId: item._id } } }
+    );
+
+    if (result.matchedCount === 0) {
+        // Either the cart doesn't exist yet or the item is already in it.
+        const cart = await Cart.findOne({ userId: req.user._id });
+        if (cart) return res.status(400).json({ message: 'This item is already in your cart' });
+        await Cart.create({ userId: req.user._id, items: [{ itemId: item._id }] });
+    }
+
+    res.json(await cartResponse(req.user._id));
 });
 
-// @route   DELETE /api/cart/clear
-// @desc    Clear all items from cart
-router.delete('/clear', protect, async (req, res) => {
-    try {
-        let cart = await Cart.findOne({ userId: req.user._id });
-        if (cart) {
-            cart.items = [];
-            await cart.save();
-        }
-        res.json({ message: 'Cart cleared' });
-    } catch (error) {
-        res.status(500).json({ message: 'Error clearing cart' });
-    }
+// DELETE /api/cart/:itemId
+router.delete('/:itemId', async (req, res) => {
+    await Cart.updateOne({ userId: req.user._id }, { $pull: { items: { itemId: req.params.itemId } } });
+    res.json(await cartResponse(req.user._id));
+});
+
+// DELETE /api/cart
+router.delete('/', async (req, res) => {
+    await Cart.updateOne({ userId: req.user._id }, { $set: { items: [] } });
+    res.json({ items: [] });
 });
 
 module.exports = router;
