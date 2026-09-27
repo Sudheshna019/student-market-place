@@ -1,17 +1,17 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router';
-import { api, itemImageUrl } from '../api';
+import { api, itemImageUrl } from '../services/api';
 import Avatar from '../components/Avatar';
 import { PriceLabel } from '../components/ItemCard';
 import ItemImage from '../components/ItemImage';
+import OrdersList from '../components/OrdersList';
 import Loader from '../components/Loader';
 import PasswordInput from '../components/PasswordInput';
 import { RequireAuth } from '../components/RequireAuth';
 import { useAlert } from '../context/AlertContext';
 import { useAuth } from '../context/AuthContext';
 import { useUI } from '../context/UIContext';
-import { categoryLabel, compressImage } from '../utils';
-import { OrdersList } from './MyOrders';
+import { categoryLabel, compressImage } from '../utils/helpers';
 
 const STATUS_BADGE = { available: 'bg-success', sold: 'bg-secondary', borrowed: 'bg-warning text-dark' };
 

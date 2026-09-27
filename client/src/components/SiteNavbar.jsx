@@ -4,7 +4,7 @@ import { Link, NavLink, useLocation, useNavigate, useSearchParams } from 'react-
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useUI } from '../context/UIContext';
-import { CATEGORIES } from '../utils';
+import { CATEGORIES } from '../utils/helpers';
 
 export default function SiteNavbar() {
     const { user } = useAuth();

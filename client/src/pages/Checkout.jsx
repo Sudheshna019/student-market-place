@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
-import { api } from '../api';
+import { api } from '../services/api';
 import { RequireAuth } from '../components/RequireAuth';
 import { useAlert } from '../context/AlertContext';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
-import { formatPrice } from '../utils';
-import { cartTotals } from './Cart';
+import { cartTotals, formatPrice } from '../utils/helpers';
 
 function CheckoutForm() {
     const { user } = useAuth();

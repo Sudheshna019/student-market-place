@@ -1,10 +1,10 @@
 import { Link, useSearchParams } from 'react-router';
-import { api } from '../../api';
+import { api } from '../../services/api';
 import Loader from '../../components/Loader';
 import { StatusBadge } from '../../components/OrderCard';
 import { useAlert } from '../../context/AlertContext';
-import { formatDate, formatPrice, shortId } from '../../utils';
-import useAdminData from './useAdminData';
+import { formatDate, formatPrice, shortId } from '../../utils/helpers';
+import useAdminData from '../../hooks/useAdminData';
 
 const NEXT = {
     pending: [{ status: 'confirmed', label: 'Confirm', className: 'btn-outline-primary' }],

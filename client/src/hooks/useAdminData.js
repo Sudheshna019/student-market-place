@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { api } from '../../api';
+import { api } from '../services/api';
 
 // Fetches an admin endpoint and exposes a reload function for after mutations.
 export default function useAdminData(path) {

@@ -17,6 +17,14 @@ export function formatPrice(value) {
     return rupees.format(Number(value) || 0);
 }
 
+// Totals for the items in the cart that can still be bought.
+export function cartTotals(items) {
+    const available = items.filter((i) => i.available);
+    const subtotal = available.reduce((sum, i) => sum + i.price, 0);
+    const deposits = available.reduce((sum, i) => sum + (i.type === 'borrow' ? i.deposit : 0), 0);
+    return { count: available.length, subtotal, deposits, total: subtotal + deposits };
+}
+
 export function formatDate(value, withTime = true) {
     if (!value) return '';
     return new Date(value).toLocaleString('en-IN', {

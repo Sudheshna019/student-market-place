@@ -1,4 +1,4 @@
-import { PLACEHOLDER_IMAGE } from '../api';
+import { PLACEHOLDER_IMAGE } from '../services/api';
 
 // <img> that falls back to the placeholder when the image is missing (e.g. a deleted listing).
 export default function ItemImage({ src, alt, className, style }) {

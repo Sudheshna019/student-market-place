@@ -1,8 +1,8 @@
 import { Link } from 'react-router';
-import { itemImageUrl } from '../api';
+import { itemImageUrl } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
-import { formatPrice } from '../utils';
+import { formatPrice } from '../utils/helpers';
 import ItemImage from './ItemImage';
 
 export function PriceLabel({ item, className = 'h5 mb-0 text-primary' }) {

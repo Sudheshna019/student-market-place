@@ -1,5 +1,5 @@
 import { Link } from 'react-router';
-import { CATEGORIES } from '../utils';
+import { CATEGORIES } from '../utils/helpers';
 
 export default function Footer() {
     return (

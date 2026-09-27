@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
-import { api, itemImageUrl } from '../../api';
+import { api, itemImageUrl } from '../../services/api';
 import ItemImage from '../../components/ItemImage';
 import Loader from '../../components/Loader';
 import { useAlert } from '../../context/AlertContext';
-import { categoryLabel, formatDate, formatPrice } from '../../utils';
-import useAdminData from './useAdminData';
+import { categoryLabel, formatDate, formatPrice } from '../../utils/helpers';
+import useAdminData from '../../hooks/useAdminData';
 
 const STATUS_BADGE = { available: 'bg-success', sold: 'bg-secondary', borrowed: 'bg-warning text-dark' };
 

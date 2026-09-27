@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { api } from '../api';
+import { api } from '../services/api';
 import { useUI } from '../context/UIContext';
 import ItemCard from './ItemCard';
 import Loader from './Loader';

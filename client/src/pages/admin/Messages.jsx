@@ -1,8 +1,8 @@
-import { api } from '../../api';
+import { api } from '../../services/api';
 import Loader from '../../components/Loader';
 import { useAlert } from '../../context/AlertContext';
-import { formatDate } from '../../utils';
-import useAdminData from './useAdminData';
+import { formatDate } from '../../utils/helpers';
+import useAdminData from '../../hooks/useAdminData';
 
 export default function Messages() {
     const showAlert = useAlert();

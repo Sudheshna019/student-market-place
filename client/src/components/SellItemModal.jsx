@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Modal } from 'react-bootstrap';
-import { api, itemImageUrl } from '../api';
+import { api, itemImageUrl } from '../services/api';
 import { useAlert } from '../context/AlertContext';
 import { useUI } from '../context/UIContext';
-import { CATEGORIES, CONDITIONS, compressImage } from '../utils';
+import { CATEGORIES, CONDITIONS, compressImage } from '../utils/helpers';
 
 const EMPTY = {
     type: 'sale',

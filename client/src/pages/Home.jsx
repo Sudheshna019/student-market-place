@@ -1,7 +1,7 @@
 import { Link } from 'react-router';
 import ItemGrid from '../components/ItemGrid';
 import { useUI } from '../context/UIContext';
-import { CATEGORIES } from '../utils';
+import { CATEGORIES } from '../utils/helpers';
 
 export default function Home() {
     const { openSell } = useUI();

@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { api } from '../../api';
+import { api } from '../../services/api';
 import Loader from '../../components/Loader';
 import { useAlert } from '../../context/AlertContext';
 import { useAuth } from '../../context/AuthContext';
-import { formatDate } from '../../utils';
-import useAdminData from './useAdminData';
+import { formatDate } from '../../utils/helpers';
+import useAdminData from '../../hooks/useAdminData';
 
 export default function Users() {
     const { user: me } = useAuth();

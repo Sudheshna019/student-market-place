@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import { Link, useParams } from 'react-router';
-import { api } from '../api';
+import { api } from '../services/api';
 import ItemImage, { orderItemImageUrl } from '../components/ItemImage';
 import Loader from '../components/Loader';
 import { StatusBadge } from '../components/OrderCard';
 import { RequireAuth } from '../components/RequireAuth';
 import { useAlert } from '../context/AlertContext';
-import { formatDate, formatPrice, shortId } from '../utils';
+import { formatDate, formatPrice, shortId } from '../utils/helpers';
 
 // Buttons shown for each role and status; mirrors the rules enforced by the API.
 const ACTIONS = {

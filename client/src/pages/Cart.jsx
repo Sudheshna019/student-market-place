@@ -1,18 +1,11 @@
 import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router';
-import { itemImageUrl } from '../api';
+import { itemImageUrl } from '../services/api';
 import ItemImage from '../components/ItemImage';
 import Loader from '../components/Loader';
 import { RequireAuth } from '../components/RequireAuth';
 import { useCart } from '../context/CartContext';
-import { formatPrice } from '../utils';
-
-export function cartTotals(items) {
-    const available = items.filter((i) => i.available);
-    const subtotal = available.reduce((sum, i) => sum + i.price, 0);
-    const deposits = available.reduce((sum, i) => sum + (i.type === 'borrow' ? i.deposit : 0), 0);
-    return { count: available.length, subtotal, deposits, total: subtotal + deposits };
-}
+import { cartTotals, formatPrice } from '../utils/helpers';
 
 function CartContents() {
     const { items, loading, refresh, removeFromCart } = useCart();

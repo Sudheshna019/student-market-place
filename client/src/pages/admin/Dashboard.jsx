@@ -1,8 +1,8 @@
 import { Link } from 'react-router';
 import Loader from '../../components/Loader';
 import { StatusBadge } from '../../components/OrderCard';
-import { formatDate, formatPrice, shortId } from '../../utils';
-import useAdminData from './useAdminData';
+import { formatDate, formatPrice, shortId } from '../../utils/helpers';
+import useAdminData from '../../hooks/useAdminData';
 
 export default function Dashboard() {
     const { data: stats, error } = useAdminData('/admin/stats');

@@ -1,5 +1,5 @@
 import { Link } from 'react-router';
-import { formatDate, formatPrice, ORDER_STATUS_BADGE, shortId } from '../utils';
+import { formatDate, formatPrice, ORDER_STATUS_BADGE, shortId } from '../utils/helpers';
 import ItemImage, { orderItemImageUrl } from './ItemImage';
 
 export function StatusBadge({ status, className = '' }) {

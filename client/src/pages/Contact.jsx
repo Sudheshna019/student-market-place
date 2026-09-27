@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { api } from '../api';
+import { api } from '../services/api';
 import { useAlert } from '../context/AlertContext';
 import { useAuth } from '../context/AuthContext';
 

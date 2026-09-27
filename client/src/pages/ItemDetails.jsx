@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router';
-import { api, itemImageUrl } from '../api';
+import { api, itemImageUrl } from '../services/api';
 import { CartButton, PriceLabel } from '../components/ItemCard';
 import ItemImage from '../components/ItemImage';
 import Loader from '../components/Loader';
 import { useAuth } from '../context/AuthContext';
 import { useUI } from '../context/UIContext';
-import { categoryLabel, formatDate, formatPrice } from '../utils';
+import { categoryLabel, formatDate, formatPrice } from '../utils/helpers';
 
 export default function ItemDetails() {
     const { id } = useParams();

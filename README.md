@@ -33,21 +33,40 @@ Built with the **MERN stack**: MongoDB, Express, React and Node.js. Deployed on 
 ## Project structure
 
 ```
-├── api/index.js        # Vercel serverless entry → exports the Express app
-├── client/             # React app (Vite)
-│   ├── public/images/  # Hero and category images
+student-marketplace/
+├── client/                    # Frontend: React (Vite)
+│   ├── public/images/         # Hero and category images
+│   ├── index.html
+│   ├── vite.config.js         # Dev server + /api proxy to :5000
 │   └── src/
-│       ├── components/ # Navbar, modals, item cards, etc.
-│       ├── context/    # Auth, cart, alerts and modal state
-│       └── pages/      # Home, Category, Cart, Checkout, Orders, Profile, admin/…
-├── server/             # Express API
-│   ├── app.js          # Express app (routes, error handling)
-│   ├── server.js       # Local dev entry (app.listen)
-│   ├── models/         # User, Item, Cart, Order, ContactMessage
-│   ├── routes/         # auth, items, cart, orders, contact, admin
-│   └── scripts/        # seed.js (demo data), makeAdmin.js
-└── vercel.json
+│       ├── components/        # Navbar, Footer, ItemCard, modals, OrdersList, …
+│       ├── context/           # AuthContext, CartContext, UIContext, AlertContext
+│       ├── hooks/             # useAdminData
+│       ├── pages/             # Home, Category, Cart, Checkout, MyOrders, Profile, …
+│       │   └── admin/         # Dashboard, Users, Products, Orders, Messages
+│       ├── services/api.js    # fetch wrapper that talks to the Express API
+│       ├── utils/helpers.js   # categories, price/date formatting, image compression
+│       ├── App.jsx            # Routes
+│       ├── main.jsx           # Entry point + providers
+│       └── index.css
+├── server/                    # Backend: Node.js + Express + MongoDB
+│   ├── config/db.js           # MongoDB (Mongoose) connection
+│   ├── controllers/           # Request logic: auth, item, cart, order, contact, admin
+│   ├── middleware/            # JWT auth (protect, adminOnly), rate limiting
+│   ├── models/                # Mongoose schemas: User, Item, Cart, Order, ContactMessage
+│   ├── routes/                # URL → controller mapping
+│   ├── utils/validate.js      # Input validation helpers
+│   ├── scripts/               # seed.js (demo data), makeAdmin.js
+│   ├── app.js                 # Express app (middleware, routes, error handler)
+│   ├── server.js              # Starts the server locally (app.listen)
+│   └── .env.example           # Environment variables template
+├── api/index.js               # Vercel serverless entry (exports the Express app)
+├── vercel.json                # Vercel build + routing config
+├── package.json               # npm workspaces: client + server
+└── README.md
 ```
+
+Request flow: **React page → `services/api.js` → Express route → middleware → controller → Mongoose model → MongoDB Atlas**.
 
 ## Run locally
 
